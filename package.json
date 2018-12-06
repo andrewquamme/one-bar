@@ -1,0 +1,35 @@
+{
+  "name": "one-bar",
+  "version": "1.0.0",
+  "description": "Code301 Final Project ",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrewquamme/one-bar.git"
+  },
+  "keywords": [
+    "outdoors",
+    "hiking",
+    "service",
+    "cellphone",
+    "backpacking"
+  ],
+  "author": "Adam Wittnam Andrew Quamme Michael George Jared Pattison",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andrewquamme/one-bar/issues"
+  },
+  "homepage": "https://github.com/andrewquamme/one-bar#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^6.2.0",
+    "express": "^4.16.4",
+    "pg": "^7.7.1",
+    "superagent": "^4.0.0",
+    "twilio": "^3.25.0"
+  }
+}
