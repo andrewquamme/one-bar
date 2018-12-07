@@ -48,10 +48,11 @@ function Location(query, res) {
 
 Location.prototype = {
   save: function() {
-    const SQL = `UPDATE user_info SET latitude=$1 longitude=$2 WHERE number=$3;`;
+    const SQL = `UPDATE user_info SET latitude=$1, longitude=$2 WHERE number=$3;`;
     const values = [ this.latitude, this.longitude, this.number];
     console.log(this)
-    return dbClient.query(SQL, values)
+    dbClient.query(SQL, values);
+    return;
   }
 }
 
@@ -64,58 +65,65 @@ function smsHandler(request, response) {
   dbClient.query(SQL, values).then(result => {
     if (result.rowCount > 0) {
       console.log('number found')
-      // console.log('result.rows[0]: ', result.rows[0])
-      getPreferences(request, response, result.rows[0]);
+      console.log('result.rows[0]: ', result.rows[0])
+      processText(request, response, result.rows[0]);
     } else {
       console.log('number not found'); //code for number not found
     }
   });
 }
 
-function getPreferences(request, response, query) {
-  // console.log('query: ', query);
+function processText(request, response, query) {
+  console.log('query: ', query);
+  console.log('request', request.query.Body);
   const infoRequest = request.query.Body.toLowerCase();
-  if (infoRequest.includes('weather')) {
-    const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${query.latitude},${query.longitude}`;
-    superagent.get(url)
-      .then(result => {
-        const weatherSumm = new Weather(result.body.currently);
-        // const weatherSummValues = Object.values(weatherSumm);
-        // console.log('weatherSummValues: ', weatherSummValues)
-        console.log('weatherSumm ', weatherSumm)
-        let message = `Hi ${query.name}\nThe forcaste for today is ${weatherSumm.forecast}\nHigh of ${weatherSumm.temperature}\nWind Speed of ${weatherSumm.windSpeed}\nAnd ${weatherSumm.precipProbability}% chance of precipitation`;
-        console.log('message = ', message);
-        // sendMessage(request, response, message);
-      })
-  }
+
   if (infoRequest.includes('location')) {
     let location = infoRequest.slice(9);
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${location}&key=${process.env.GOOGLE_API_KEY}`;
     superagent.get(url)
       .then(result => {
-        // console.log('google result = ', result.body.results[0].geometry.location.lng)
+        console.log('google result = ', result.body.results[0].geometry.location.lng)
         const location = new Location(query, result);
         location.save();
-        // let message = `Hi ${query.name}\nYour location is currently `
+        let message = `Hi ${query.name}\nYour location is currently ${location.latitude}, ${location.longitude}`
+        sendMessage(request, response, message);
       })
       .catch(error => handleError(error));
-  }
+  } else {
 
+    // Process text, request APIs, send results via SMS
+
+    if (infoRequest.includes('weather')) {
+      const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${query.latitude},${query.longitude}`;
+      superagent.get(url)
+        .then(result => {
+          const weatherSumm = new Weather(result.body.currently);
+          // const weatherSummValues = Object.values(weatherSumm);
+          // console.log('weatherSummValues: ', weatherSummValues)
+          console.log('weatherSumm ', weatherSumm)
+          let message = `Hi ${query.name}\nThe forcaste for today is ${weatherSumm.forecast}\nHigh of ${weatherSumm.temperature}\nWind Speed of ${weatherSumm.windSpeed}\nAnd ${weatherSumm.precipProbability}% chance of precipitation`;
+          console.log('message = ', message);
+          sendMessage(request, response, message);
+        })
+    }
+
+  }//end of else
 }
 
 function sendMessage(request, response, message) {
   console.log('inside sendMessage, message = ', message)
-  smsClient.messages
-    .create({
-      body: message,
-      from: process.env.TWILIO_NUMBER,
-      to: request.query.From
-    })
-    .then(message => {
-      console.log(message.sid);
-      response.send('This message goes to website');
-    })
-    .done();
+  // smsClient.messages
+  //   .create({
+  //     body: message,
+  //     from: process.env.TWILIO_NUMBER,
+  //     to: request.query.From
+  //   })
+  //   .then(message => {
+  //     console.log(message.sid);
+  //     response.send('This message goes to website');
+  //   })
+  //   .done();
 }
 
 app.get('*', (request, response) => {
