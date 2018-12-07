@@ -25,11 +25,10 @@ app.get('/location', (request, response) => {
     .catch(error => handleError(error, response));
 })
 app.get('/weather', getWeather);
-app.get('/mountainPass', getMountainPass);
-app.get('/highwayAlert', getHighwayAlert);
-app.get('/yelp', getYelp);
+app.get('/hospitals', getHospitals);
+app.get('/gas', getGas);
+app.get('/lodging', getLodging);
 app.get('/trails', getTrails);
-// app.get('/parks', getParks);
 
 //make sure the server is listening for requests
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
@@ -52,23 +51,25 @@ function Weather(day) {
   this.precipProbability = day.precipProbability;
 }
 
-function MountainPass(mountain) {
-  this.name = mountain.MountainPassName;
-  this.roadCondition = mountain.RoadCondition;
-  this.tempatureInFahrenheit = mountain.TemperatureInFahrenheit;
-  this.weatherCondition = mountain.WeatherCondition;
-}
-
-function HighwayAlert(highway) {
-  this.name = highway.EndRoadwayLocation.Description; // Road name
-  this.status = highway.EventStatus; // open or closed
-  this.description = highway.HeadlineDescription; // Alert description
-}
-
-function Yelp(business) {
+function Hospitals(business) {
   this.name = business.name;
   //this.rating = business.rating;
-  this.price = business.price;
+  this.address = business.location.display_address;
+  this.phone = business.phone;
+}
+
+function GasStations(business) {
+  this.name = business.name;
+  //this.rating = business.rating;
+  this.address = business.location.display_address;
+  this.phone = business.phone;
+}
+
+function Lodging(business) {
+  this.name = business.name;
+  //this.rating = business.rating;
+  this.address = business.location.display_address;
+  this.phone = business.phone;
 }
 
 function Trails(trail) {
@@ -108,42 +109,47 @@ function getWeather(request, response) {
     .catch(error => handleError(error, response));
 }
 
-function getMountainPass(request, response) {
-  const url =  `http://wsdot.com/Traffic/api/MountainPassConditions/MountainPassConditionsREST.svc/GetMountainPassConditionsAsJson?AccessCode=${APIKEY}`;
+function getHospitals(request, response) {
+  const url = `https://api.yelp.com/v3/businesses/search?categories=hospitals&limit=1&latitude=47&longitude=-122`;
   superagent.get(url)
+    .set('Authorization', `Bearer CTyh5NRXQW09RbowjyKn6PEEXfrJHAWOrS08uGIJ2u11ss_Q6QiV4aRnh5kRgePjCqO9aHWOSg-teM6BYCVkNZ44QvV01IEKqFPKEHExqvyn5WXQNRdAWSDhLpr1W3Yx`)
     .then(result => {
-      let mountainSumm = new MountainPass(result.body[0]);
-      let mountainSummValues = Object.values(mountainSumm);
-      response.send(mountainSummValues);
+      let hospitalSumm = result.body.businesses.map(function (hospitals) {
+        return new Hospitals(hospitals);
+      });
+      response.send(hospitalSumm);
     })
     .catch(error => handleError(error, response));
 }
 
-function getHighwayAlert(request, response) {
-  const url = `http://wsdot.wa.gov/Traffic/api/HighwayAlerts/HighwayAlertsREST.svc/GetAlertsAsJson?AccessCode=${APIKEY}`;
+function getGas(request, response) {
+  const url = `https://api.yelp.com/v3/businesses/search?categories=servicestations&limit=3&latitude=47&longitude=-122`;
   superagent.get(url)
+    .set('Authorization', `Bearer CTyh5NRXQW09RbowjyKn6PEEXfrJHAWOrS08uGIJ2u11ss_Q6QiV4aRnh5kRgePjCqO9aHWOSg-teM6BYCVkNZ44QvV01IEKqFPKEHExqvyn5WXQNRdAWSDhLpr1W3Yx`)
     .then(result => {
-      let highwaySumm = new HighwayAlert(result.body[0]);
-      let highwaySummValues = Object.values(highwaySumm);
-      response.send(highwaySummValues);
+      let gasSumm = result.body.businesses.map(function (gas) {
+        return new GasStations(gas);
+      });
+      response.send(gasSumm);
     })
     .catch(error => handleError(error, response));
 }
 
-function getYelp(request, response) {
-  const url = `https://api.yelp.com/v3/businesses/search?term=gas&latitude=47&longitude=-122`;
+function getLodging(request, response) {
+  const url = `https://api.yelp.com/v3/businesses/search?categories=hotels&limit=3&latitude=47&longitude=-122`;
   superagent.get(url)
-    .set('Authorization', `Bearer ${APIKEY}`)
+    .set('Authorization', `Bearer CTyh5NRXQW09RbowjyKn6PEEXfrJHAWOrS08uGIJ2u11ss_Q6QiV4aRnh5kRgePjCqO9aHWOSg-teM6BYCVkNZ44QvV01IEKqFPKEHExqvyn5WXQNRdAWSDhLpr1W3Yx`)
     .then(result => {
-      // console.log(result.body.businesses);
-      let yelpSumm = new Yelp(result.body.businesses);
-      response.send(yelpSumm);
+      let hotelSumm = result.body.businesses.map(function (hotel) {
+        return new Lodging(hotel);
+      });
+      response.send(hotelSumm);
     })
     .catch(error => handleError(error, response));
 }
 
 function getTrails(request, response) {
-  const url = `https://www.hikingproject.com/data/get-trails?lat=47&lon=-122&key=https://www.hikingproject.com/data/get-trails?lat=47&lon=-122&key=${APIKEY}`;
+  const url = `https://www.hikingproject.com/data/get-trails?lat=47&lon=-122&key=https://www.hikingproject.com/data/get-trails?lat=47&lon=-122&key=200392055-11baa93a1e6ac1245d052da581b24a02&maxDistance=10`;
   superagent.get(url)
     .then(result => {
       const trailListings = result.body.trails.map(function (trail) {
