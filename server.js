@@ -31,7 +31,7 @@ function smsHandler(request, response) {
       console.log('number found');
       smsClient.messages
         .create({
-          body: `Hi ${result.rows[0].name}, your message was: ${request.query.Body}`,
+          body: `Hi ${result.rows[0].name},\n your message was: ${request.query.Body}`,
           from: process.env.TWILIO_NUMBER,
           to: request.query.From
         })
