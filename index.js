@@ -28,7 +28,7 @@ app.get('/weather', getWeather);
 app.get('/mountainPass', getMountainPass);
 app.get('/highwayAlert', getHighwayAlert);
 app.get('/yelp', getYelp);
-// app.get('/trails', getTrails);
+app.get('/trails', getTrails);
 // app.get('/parks', getParks);
 
 //make sure the server is listening for requests
@@ -71,20 +71,20 @@ function Yelp(business) {
   this.price = business.price;
 }
 
-// function Trails(trail) {
-//   this.tableName = 'trails';
-//   //this.trail_url = trail.url;
-//   this.name = trail.name;
-//   this.location = trail.location;
-//   this.length = trail.length;
-//   //this.condition_date = trail.conditionDate.split(' ')[0];
-//   //this.condition_time = trail.conditionDate.split(' ')[1];
-//   this.conditions = trail.conditionStatus;
-//   //this.stars = trail.stars;
-//   //this.stars_votes = trail.starVotes;
-//   //this.summary = trail.summary;
-//   //this.created_at = Date.now();
-// }
+function Trails(trail) {
+  this.tableName = 'trails';
+  //this.trail_url = trail.url;
+  this.name = trail.name;
+  this.location = trail.location;
+  this.length = trail.length;
+  //this.condition_date = trail.conditionDate.split(' ')[0];
+  //this.condition_time = trail.conditionDate.split(' ')[1];
+  this.conditions = trail.conditionStatus;
+  //this.stars = trail.stars;
+  //this.stars_votes = trail.starVotes;
+  //this.summary = trail.summary;
+  //this.created_at = Date.now();
+}
 
 //***********************HELPER FUNCTIONS****************************** */
 
@@ -138,6 +138,16 @@ function getYelp(request, response) {
       // console.log(result.body.businesses);
       let yelpSumm = new Yelp(result.body.businesses);
       response.send(yelpSumm);
+    })
+    .catch(error => handleError(error, response));
+}
+
+function getTrails(request, response) {
+  const url = `https://www.hikingproject.com/data/get-trails?lat=47&lon=-122&key=https://www.hikingproject.com/data/get-trails?lat=47&lon=-122&key=200392055-11baa93a1e6ac1245d052da581b24a02`;
+  superagent.get(url)
+    .then(result => {
+      let trailSumm = new Trails(result);
+      response.send(trailSumm);
     })
     .catch(error => handleError(error, response));
 }
