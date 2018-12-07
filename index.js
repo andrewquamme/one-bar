@@ -72,7 +72,7 @@ function Yelp(business) {
 }
 
 function Trails(trail) {
-  this.tableName = 'trails';
+  // this.tableName = 'trails';
   //this.trail_url = trail.url;
   this.name = trail.name;
   this.location = trail.location;
@@ -143,11 +143,13 @@ function getYelp(request, response) {
 }
 
 function getTrails(request, response) {
-  const url = `https://www.hikingproject.com/data/get-trails?lat=47&lon=-122&key=https://www.hikingproject.com/data/get-trails?lat=47&lon=-122&key=200392055-11baa93a1e6ac1245d052da581b24a02`;
+  const url = `https://www.hikingproject.com/data/get-trails?lat=47&lon=-122&key=https://www.hikingproject.com/data/get-trails?lat=47&lon=-122&key=${APIKEY}`;
   superagent.get(url)
     .then(result => {
-      let trailSumm = new Trails(result);
-      response.send(trailSumm);
+      const trailListings = result.body.trails.map(function (trail) {
+        return new Trails(trail);
+      })
+      response.send(trailListings);
     })
     .catch(error => handleError(error, response));
 }
