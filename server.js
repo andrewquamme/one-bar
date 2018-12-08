@@ -129,7 +129,7 @@ function processText(request, response, query) {
         })
         .catch(error => handleError(error, response));
     }
-    if (infoRequest.includes('help')) {
+    if (infoRequest.includes('options')) {
       let message = `Hi ${query.name},\nAvailable Commands:\nLOCATION [City, State]\nWEATHER\nTRAILS\nLODGING\nGAS\nHOSPITALS`;
       sendMessage(request, response, message);
     }
