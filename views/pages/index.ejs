@@ -3,56 +3,68 @@
 
   <head>
     <title>One-Bar</title>
-    <link rel="stylesheet" href="./../../public/styles/reset.css">
-    <link rel="stylesheet" href="./../../public/styles/layout.css">
-    <link rel="stylesheet" href="./../../public/styles/base.css">
+    <link rel="stylesheet" href="/styles/reset.css">
+    <link rel="stylesheet" href="/styles/layout.css">
+    <link rel="stylesheet" href="/styles/base.css">
   </head>
 
   <body>
 
     <header>
-      <h1>Welcome To One-Bar</h1>
-      <h2>Connect to Nature</h2>
+      <div id="logo">
+        <img src="/assests/logo.png" alt="One-Bar" />
+      </div>
     </header>
 
     <main>
+      <div id="h3">
+        <h3>One bar offers updated information sent via SMS to your mobile phone upon request. Perfect for quick updates when reception is limited. Just send us your location and then you can request your updates at anytime! You are only one-bar away from connecting with nature!</h3>
+      </div>
 
-      <p>One-Bar offers updated information sent via SMS to your mobile phone upon request. Perfect for quick updates when reception is limited. You can pre-select the information that you want sent to you or simply give us your location and we will send you a default selection that includes weather and news headlines.</p>
+    <div id="commands">
 
-      <form>
+      <ul>
 
-        <fieldset>
+        <li>Help</li>
+        <ul>
+          <li>Text Help for a List of Commands</li>
+        </ul>
+        <li>Location</li>
+        <ul>
+          <li>*Required Command* Text Location Followed by a City and State to Update your Location in our System</li>
+        </ul>
+        <li>Weather</li>
+        <ul>
+          <li>Text Weather for Current Weather Conditions in your Area</li>
+        </ul>
+        <li>Trails</li>
+        <ul>
+          <li>Text Trails to Receive Nearby Trail Information</li>
+        </ul>
+        <li>Lodging</li>
+        <ul>
+          <li>Text Lodging to Receive Nearby Lodging Information</li>
+        </ul>
+        <li>Gas</li>
+        <ul>
+          <li>Text Gas to Find Nearby Gas/Service Stations</li>
+        </ul>
+        <li>Hospitals</li>
+        <ul>
+          <li>Text Hospitals to Locate Nearby Hospitals/Emergency Rooms</li>
+        </ul>
 
-            <legend>Please Enter Your Phone Number:</legend>  
-            <label for="#">Phone Number: </label>
-            <input name="phoneNumber" type="text" size="14" required />
+      </ul>
 
-            <legend>Select Update Options:</legend>  
-            <label for="#">Options: </label>
-            <ul>
-            <li><input type="checkbox" name="option" type="text" size="50" required />Weather</li>
-            <li><input type="checkbox" name="option" type="text" size="50" required />Headlines</li>
-            <li><input type="checkbox" name="option" type="text" size="50" required />Trail Info</li>
-            <li><input type="checkbox" name="option" type="text" size="50" required />Park Alerts</li>
-            <li><input type="checkbox" name="option" type="text" size="50" required />Road Closures</li>
-            <li><input type="checkbox" name="option" type="text" size="50" required />Gas/Lodging</li>
-            <li><input type="checkbox" name="option" type="text" size="50" required />Emergency Room</li>
-            <li><input type="checkbox" name="option" type="text" size="50" required />Sports Updates</li>
-            <li><input type="checkbox" name="option" type="text" size="50" required />Tide Schedule</li>
-            </ul> 
-
-            <legend>Please Enter Your Location:</legend>  
-            <label for="#">Location: </label>
-            <input name="location" type="text" size="50" required />
-
-        </fieldset>
-
-      </form>
+    </div>
 
     </main>
 
-    <footer>   
-         <p>Copyright: 2018</p>
+    <footer>
+      <ul>
+        <li>One-Bar &copy; 2018</li>
+        <li><a href="/about">Meet the Developers</a></li>
+      </ul>
     </footer>
 
   </body>
