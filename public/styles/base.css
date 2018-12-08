@@ -1,0 +1,48 @@
+body {
+  background: rgb(255, 252, 229);
+  font-family: 'Courier New', Courier, monospace;
+  width: 480px;
+  margin: auto;
+}
+
+header img {
+  width: 200px;
+}
+
+#logo {
+  width: 100%;
+  text-align: center;
+}
+
+main {
+  width: 100%;
+}
+
+main h3 {
+  margin: 20px;
+}
+
+#h3 {
+  text-align: center;
+}
+
+main ul {
+  margin-left: 40px;
+  list-style: outside;
+}
+
+main ul ul {
+  margin-left: 20px;
+  list-style-type: circle;
+}
+
+footer {
+  width: 100%;
+  text-align: center;
+  margin: 20px;
+}
+
+footer ul li {
+  display: inline-block;
+  margin-left: 20px;
+}
