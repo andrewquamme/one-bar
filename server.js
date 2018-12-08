@@ -79,7 +79,8 @@ function smsHandler(request, response) {
       console.log('result.rows[0]: ', result.rows[0])
       processText(request, response, result.rows[0]);
     } else {
-      console.log('number not found'); //code for number not found
+      console.log('number not found'); 
+      //codez for number not found goez herr
     }
   });
 }
@@ -109,7 +110,7 @@ function processText(request, response, query) {
           const weatherSumm = new Weather(result.body.currently);
           // const weatherSummValues = Object.values(weatherSumm);
           // console.log('weatherSummValues: ', weatherSummValues)
-          let message = `Hi ${query.name}\nThe forcaste for today is ${weatherSumm.forecast}\nHigh of ${weatherSumm.temperature}\nWind Speed of ${weatherSumm.windSpeed}\nAnd ${weatherSumm.precipProbability}% chance of precipitation`;
+          let message = `Hi ${query.name}\nThe forecast for today is ${weatherSumm.forecast}\nHigh of ${weatherSumm.temperature}\nWind Speed of ${weatherSumm.windSpeed}\nAnd ${weatherSumm.precipProbability}% chance of precipitation`;
           sendMessage(request, response, message);
         })
     }
@@ -142,17 +143,17 @@ function processText(request, response, query) {
 
 function sendMessage(request, response, message) {
   console.log('inside sendMessage, message = ', message)
-  // smsClient.messages
-  //   .create({
-  //     body: message,
-  //     from: process.env.TWILIO_NUMBER,
-  //     to: request.query.From
-  //   })
-  //   .then(message => {
-  //     console.log(message.sid);
-  //     response.send('This message goes to website');
-  //   })
-  //   .done();
+  smsClient.messages
+    .create({
+      body: message,
+      from: process.env.TWILIO_NUMBER,
+      to: request.query.From
+    })
+    .then(message => {
+      console.log(message.sid);
+      response.send('This message goes to website');
+    })
+    .done();
 }
 
 app.get('*', (request, response) => {
