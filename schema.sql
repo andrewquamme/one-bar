@@ -11,3 +11,7 @@ INSERT INTO user_info (number, name, latitude, longitude)
 VALUES('+12068497029', 'el Jaredito', 47.608013, -122.335167);
 INSERT INTO user_info (number, name, latitude, longitude)
 VALUES('+12533101489', 'Andrew', 47.608013, -122.335167);
+INSERT INTO user_info (number, name, latitude, longitude)
+VALUES('+12103631168', 'Adam', 47, -122);
+INSERT INTO user_info (number, name, latitude, longitude)
+VALUES('+12533803465', 'Michael', 47, -122);
