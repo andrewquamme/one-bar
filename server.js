@@ -15,11 +15,11 @@ app.set('view engine', 'ejs');
 // Load environment variables from .env file
 require('dotenv').config();
 
-app.get('/', function(req, response) {  
+app.get('/', function(req, response) {
   response.render('pages/index')
 });
 
-app.get('/geolocate', function(req, response) {  
+app.get('/geolocate', function(req, response) {
   response.render('pages/geolocate')
 });
 
@@ -38,6 +38,12 @@ app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 function handleError(err, res) {
   console.error(err);
   if (res) res.status(500).send('Sorry, something went wrong');
+}
+function Hospitals(business) {
+  this.name = business.name;
+  //this.rating = business.rating;
+  this.address = business.location.display_address;
+  this.phone = business.phone;
 }
 
 function Location(query, res) {
@@ -74,8 +80,6 @@ function smsHandler(request, response) {
 }
 
 function processText(request, response, query) {
-  console.log('query: ', query);
-  console.log('request', request.query.Body);
   const infoRequest = request.query.Body.toLowerCase();
 
   if (infoRequest.includes('location')) {
@@ -83,7 +87,6 @@ function processText(request, response, query) {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${location}&key=${process.env.GOOGLE_API_KEY}`;
     superagent.get(url)
       .then(result => {
-        console.log('google result = ', result.body.results[0].geometry.location.lng)
         const location = new Location(query, result);
         location.save();
         let message = `Hi ${query.name}\nYour location is currently ${location.latitude}, ${location.longitude}`
@@ -101,15 +104,36 @@ function processText(request, response, query) {
           const weatherSumm = new Weather(result.body.currently);
           // const weatherSummValues = Object.values(weatherSumm);
           // console.log('weatherSummValues: ', weatherSummValues)
-          console.log('weatherSumm ', weatherSumm)
           let message = `Hi ${query.name}\nThe forcaste for today is ${weatherSumm.forecast}\nHigh of ${weatherSumm.temperature}\nWind Speed of ${weatherSumm.windSpeed}\nAnd ${weatherSumm.precipProbability}% chance of precipitation`;
-          console.log('message = ', message);
           sendMessage(request, response, message);
         })
     }
+    //hospitals API-----------currently giving two hospitals (limit=2)//  
+    if (infoRequest.includes('hospital')) {
+      const url = `https://api.yelp.com/v3/businesses/search?categories=hospitals&limit=2&latitude=${query.latitude}&longitude=${query.longitude}`;
+      superagent.get(url)
+        .set('Authorization', `Bearer CTyh5NRXQW09RbowjyKn6PEEXfrJHAWOrS08uGIJ2u11ss_Q6QiV4aRnh5kRgePjCqO9aHWOSg-teM6BYCVkNZ44QvV01IEKqFPKEHExqvyn5WXQNRdAWSDhLpr1W3Yx`)
+        .then(result => {
+          let hospitalSumm = result.body.businesses.map(function (hospitals) {
+            return new Hospitals(hospitals);
+            
+          });
+          let message = `Hi ${query.name}\nThe nearest hospital is ${hospitalSumm[0].name}\nLocated at: ${hospitalSumm[0].address}\nPhone ${hospitalSumm[0].phone}\nNext hospital is ${hospitalSumm[1].name}\nLocated at: ${hospitalSumm[1].address}\nPhone ${hospitalSumm[1].phone}`;
+          sendMessage(request, response, message);
+        })
+        .catch(error => handleError(error, response));
+    }
+    if (infoRequest.includes('help')) {
+      let message = `Hi ${query.name},\nAvailable Commands:\nLOCATION [City, State]\nWEATHER\nTRAILS\nLODGING\nGAS\nHOSPITALS`;
+      sendMessage(request, response, message);
+    }
+
+
 
   }//end of else
 }
+
+
 
 function sendMessage(request, response, message) {
   console.log('inside sendMessage, message = ', message)
