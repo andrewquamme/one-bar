@@ -19,6 +19,10 @@ app.get('/', function(req, response) {
   response.render('pages/index')
 });
 
+app.get('/about', function(req, response) {  
+  response.render('pages/about')
+});
+
 app.get('/geolocate', function(req, response) {  
   response.render('pages/geolocate')
 });
