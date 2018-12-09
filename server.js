@@ -70,6 +70,14 @@ function Hospitals(business) {
   this.phone = business.phone;
 }
 
+// Gas Model
+function GasStations(business) {
+  this.name = business.name;
+  //this.rating = business.rating;
+  this.address = business.location.display_address;
+  this.phone = business.phone;
+}
+
 // Weather Model
 function Weather(day) {
   this.forecast = day.summary;
@@ -99,18 +107,19 @@ function smsHandler(request, response) {
     } else {
       console.log('number not found'); 
       
-      // **********Below has not been tested*************
-      
-      // const infoRequest = request.query.Body.toLowerCase();
-      // if (infoRequest.includes('name')) {
-      //   let name = infoRequest.slice(5)
-      //   const SQL = `INSERT user_info SET number=$1, name=$2;`;
-      //   const values = [request.query.From, name];
-      //   dbClient.query(SQL, values)
-      // } else {
-      //   const message = `Welcome to one-bar, please respond with NAME [YOUR NAME]`
-      //   sendMessage(request, response, message);
-      // }
+      // If number is not in DB it will prompt user to respond with name [uers name], then add number and name to DB
+      // Location is currently left blank
+      const infoRequest = request.query.Body.toLowerCase();
+      if (infoRequest.includes('name')) {
+        let name = infoRequest.slice(5)
+        console.log(`number = ${request.query.From}, body = ${infoRequest}, name = ${name}`)
+        const SQL = `INSERT INTO user_info (number, name) Values ($1, $2);`;
+        const values = [request.query.From, name];
+        dbClient.query(SQL, values)
+      } else {
+        const message = `Welcome to one-bar, please respond with NAME [YOUR NAME]`
+        sendMessage(request, response, message);
+      }
     }
   });
 }
@@ -149,6 +158,23 @@ function processText(request, response, query) {
       })
       .catch(error => handleError(error, response));
   }
+  // Gas
+  if (infoRequest.includes('gas')) {
+    let message = '';
+    const url = `https://api.yelp.com/v3/businesses/search?categories=servicestations&limit=3&latitude=${query.latitude}&longitude=${query.longitude}`;
+    superagent.get(url)
+      .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+      .then(result => {
+        let gasSumm = result.body.businesses.map(function (gas) {
+          return new GasStations(gas);
+        });
+        for (let i = 0; i < 3; i++) {
+          message += `${gasSumm[i].name} is at ${gasSumm[i].address[0]}, ${gasSumm[i].address[1].slice(0, gasSumm[i].address[1].indexOf(',') + 4)}\n`
+        }
+        sendMessage(request, response, message);
+      })
+      .catch(error => handleError(error, response));
+  }
 
   // Weather todays forecast
   if (infoRequest.includes('weather')) {
@@ -180,7 +206,7 @@ function processText(request, response, query) {
       .catch(error => handleError(error, response));
   }
 
-  // Options
+  // Options *************** We could make this an else, which would catch empty messages? ************************************
   if (infoRequest.includes('options')) {
     let message = `Hi ${query.name},\nAvailable Commands:\nLOCATION [City, State]\nWEATHER\nTRAILS\nMORE TRAILS\nLODGING\nGAS\nHOSPITALS`;
     sendMessage(request, response, message);
@@ -189,20 +215,20 @@ function processText(request, response, query) {
 
 // Create and send message via Twilio
 
-// // function sendMessage(request, response, message) {
-// //   console.log('inside sendMessage, message = ', message)
-// //   smsClient.messages
-// //     .create({
-// //       body: message,
-// //       from: process.env.TWILIO_NUMBER,
-// //       to: request.query.From
-// //     })
-// //     .then(message => {
-// //       console.log(message.sid);
-// //       response.send('This message goes to website');
-// //     })
-// //     .done();
-// // }
+function sendMessage(request, response, message) {
+  console.log('inside sendMessage, message = ', message)
+  smsClient.messages
+    .create({
+      body: message,
+      from: process.env.TWILIO_NUMBER,
+      to: request.query.From
+    })
+    .then(message => {
+      console.log(message.sid);
+      response.send('This message goes to website');
+    })
+    .done();
+}
 
 app.get('*', (request, response) => {
   response.send('Hitting the API');
