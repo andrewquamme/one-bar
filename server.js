@@ -104,6 +104,13 @@ function Trails(trail) {
   this.summary = trail.summary;
 }
 
+// Headlines Model
+function Headlines(headlines) {
+  this.title = headlines.title;
+  this.description = headlines.description;
+  this.content = headlines.content;
+}
+
 function smsHandler(request, response) {
   const SQL = 'SELECT * FROM user_info WHERE number=$1;';
   const values = [request.query.From];
@@ -114,14 +121,14 @@ function smsHandler(request, response) {
       processText(request, response, result.rows[0]);
     } else {
       console.log('number not found'); 
-      
+
       // If number is not in DB it will prompt user to respond with name [uers name], then add number and name to DB
       // Location is currently left blank but prompts user to enter one
       const infoRequest = request.query.Body.toLowerCase();
       if (infoRequest.includes('name')) {
         let name = infoRequest.slice(5);
         name = name.charAt(0).toUpperCase() + name.slice(1);
-        console.log(`number = ${request.query.From}, body = ${infoRequest}, name = ${name}`)
+        // console.log(`number = ${request.query.From}, body = ${infoRequest}, name = ${name}`)
         const SQL = `INSERT INTO user_info (number, name) Values ($1, $2);`;
         const values = [request.query.From, name];
         dbClient.query(SQL, values);
@@ -155,7 +162,6 @@ function processText(request, response, query) {
   }
   // Hospitals API - currently giving two hospitals (limit=2)
   if (infoRequest.includes('hospital')) {
-    console.log('inside hospital')
     const url = `https://api.yelp.com/v3/businesses/search?categories=hospitals&limit=2&latitude=${query.latitude}&longitude=${query.longitude}`;
     superagent
       .get(url)
@@ -234,10 +240,25 @@ function processText(request, response, query) {
       })
       .catch(error => handleError(error, response));
   }
+  //Headlines, set to 4 headlines, one text per message, content truncated to 260 chars as is returned to us from api
+  if (infoRequest.includes('headline')) {
+    const url = `https://newsapi.org/v2/top-headlines?country=us&pageSize=4&apiKey=${process.env.NEWS_API_KEY}`;
+    superagent.get(url)
+      .then(result => {
+        const newsHeadlines = result.body.articles.map(function (newsObj) {
+          return new Headlines(newsObj);
+        })
+        for (let i = 0; i < 4; i++) {
+          let message = `${newsHeadlines[i].title}\n${newsHeadlines[i].description}\n${newsHeadlines[i].content.slice(0, 260)}`;
+          sendMessage(request, response, message);
+        }
+      })
+      .catch(error => handleError(error, response));
+  }
 
   // Options *************** We could make this an else, which would catch empty messages? ************************************
   if (infoRequest.includes('options')) {
-    let message = `Hi ${query.name},\nAvailable Commands:\nLOCATION [City, State]\nWEATHER\nTRAILS\nMORE TRAILS\nLODGING\nGAS\nHOSPITALS`;
+    let message = `Hi ${query.name},\nAvailable Commands:\nLOCATION [City, State]\nWEATHER\nTRAILS\nMORE TRAILS\nLODGING\nGAS\nHOSPITALS\nHEADLINES`;
     sendMessage(request, response, message);
   }
 }
@@ -245,7 +266,7 @@ function processText(request, response, query) {
 // Create and send message via Twilio
 
 function sendMessage(request, response, message) {
-  console.log(`inside sendMessage, message =\n${message}`);
+  console.log(`Inside sendMessage, message =\n${message}`);
   smsClient.messages
     .create({
       body: message,
