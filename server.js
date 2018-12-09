@@ -78,6 +78,14 @@ function GasStations(business) {
   this.phone = business.phone;
 }
 
+// Lodging Model
+function Lodging(business) {
+  this.name = business.name;
+  this.rating = business.rating;
+  this.address = business.location.display_address;
+  this.phone = business.phone;
+}
+
 // Weather Model
 function Weather(day) {
   this.forecast = day.summary;
@@ -108,7 +116,7 @@ function smsHandler(request, response) {
       console.log('number not found'); 
       
       // If number is not in DB it will prompt user to respond with name [uers name], then add number and name to DB
-      // Location is currently left blank
+      // Location is currently left blank but prompts user to enter one
       const infoRequest = request.query.Body.toLowerCase();
       if (infoRequest.includes('name')) {
         let name = infoRequest.slice(5);
@@ -161,6 +169,7 @@ function processText(request, response, query) {
       })
       .catch(error => handleError(error, response));
   }
+
   // Gas
   if (infoRequest.includes('gas')) {
     let message = '';
@@ -179,6 +188,23 @@ function processText(request, response, query) {
       .catch(error => handleError(error, response));
   }
 
+  // Lodging
+  if (infoRequest.includes('lodging')) {
+    let message = '';
+    const url = `https://api.yelp.com/v3/businesses/search?categories=hotels&limit=3&latitude=${query.latitude}&longitude=${query.longitude}`;
+    superagent.get(url)
+      .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+      .then(result => {
+        let hotelSumm = result.body.businesses.map(function (hotel) {
+          return new Lodging(hotel);
+        });
+        for (let i = 0; i < 3; i++) {
+          message += `${hotelSumm[i].name}, ${hotelSumm[i].rating} stars\n${hotelSumm[i].address[0]}, ${hotelSumm[i].address[1].slice(0, hotelSumm[i].address[1].indexOf(',') + 10)}\nPhone: (${hotelSumm[i].phone.slice(2, 5)}) ${hotelSumm[i].phone.slice(5, 8)}-${hotelSumm[i].phone.slice(8)}\n`
+        }
+        sendMessage(request, response, message);
+      })
+      .catch(error => handleError(error, response));
+  }
   // Weather todays forecast
   if (infoRequest.includes('weather')) {
     const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${query.latitude},${query.longitude}`;
@@ -219,18 +245,18 @@ function processText(request, response, query) {
 // Create and send message via Twilio
 
 function sendMessage(request, response, message) {
-  console.log('inside sendMessage, message = ', message)
-  // smsClient.messages
-  //   .create({
-  //     body: message,
-  //     from: process.env.TWILIO_NUMBER,
-  //     to: request.query.From
-  //   })
-  //   .then(message => {
-  //     console.log(message.sid);
-  //     response.send('This message goes to website');
-  //   })
-  //   .done();
+  console.log(`inside sendMessage, message =\n${message}`);
+  smsClient.messages
+    .create({
+      body: message,
+      from: process.env.TWILIO_NUMBER,
+      to: request.query.From
+    })
+    .then(message => {
+      console.log(message.sid);
+      response.send('This message goes to website');
+    })
+    .done();
 }
 
 app.get('*', (request, response) => {
