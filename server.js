@@ -111,13 +111,16 @@ function smsHandler(request, response) {
       // Location is currently left blank
       const infoRequest = request.query.Body.toLowerCase();
       if (infoRequest.includes('name')) {
-        let name = infoRequest.slice(5)
+        let name = infoRequest.slice(5);
+        name = name.charAt(0).toUpperCase() + name.slice(1);
         console.log(`number = ${request.query.From}, body = ${infoRequest}, name = ${name}`)
         const SQL = `INSERT INTO user_info (number, name) Values ($1, $2);`;
         const values = [request.query.From, name];
-        dbClient.query(SQL, values)
+        dbClient.query(SQL, values);
+        let message = `Thanks ${name}, please respond with LOCATION [City, State]`;
+        sendMessage(request, response, message);
       } else {
-        const message = `Welcome to one-bar, please respond with NAME [YOUR NAME]`
+        let message = `Welcome to one-bar, please respond with NAME [YOUR NAME]`
         sendMessage(request, response, message);
       }
     }
@@ -137,7 +140,7 @@ function processText(request, response, query) {
       .then(result => {
         const location = new Location(query, result);
         location.save();
-        let message = `Hi ${query.name}\nYour location is currently ${location.latitude} latitude, ${location.longitude} longitude`;
+        let message = `Hi ${query.name}, your location is currently ${location.latitude} latitude, ${location.longitude} longitude`;
         sendMessage(request, response, message);
       })
       .catch(error => handleError(error));
@@ -217,17 +220,17 @@ function processText(request, response, query) {
 
 function sendMessage(request, response, message) {
   console.log('inside sendMessage, message = ', message)
-  smsClient.messages
-    .create({
-      body: message,
-      from: process.env.TWILIO_NUMBER,
-      to: request.query.From
-    })
-    .then(message => {
-      console.log(message.sid);
-      response.send('This message goes to website');
-    })
-    .done();
+  // smsClient.messages
+  //   .create({
+  //     body: message,
+  //     from: process.env.TWILIO_NUMBER,
+  //     to: request.query.From
+  //   })
+  //   .then(message => {
+  //     console.log(message.sid);
+  //     response.send('This message goes to website');
+  //   })
+  //   .done();
 }
 
 app.get('*', (request, response) => {
