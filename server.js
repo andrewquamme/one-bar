@@ -24,8 +24,8 @@ app.get('/about', function(req, response) {
   response.render('pages/about');
 });
 
-app.get('/geolocate', function(req, response) {
-  response.render('pages/geolocate');
+app.get('/request', function(req, response) {
+  response.render('pages/request');
 });
 
 app.get('/sms', smsHandler);
