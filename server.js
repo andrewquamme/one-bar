@@ -65,7 +65,6 @@ Location.prototype = {
 // Hospital Model
 function Hospitals(business) {
   this.name = business.name;
-  //this.rating = business.rating;
   this.address = business.location.display_address;
   this.phone = business.phone;
 }
@@ -73,7 +72,6 @@ function Hospitals(business) {
 // Gas Model
 function GasStations(business) {
   this.name = business.name;
-  //this.rating = business.rating;
   this.address = business.location.display_address;
   this.phone = business.phone;
 }
@@ -128,7 +126,6 @@ function smsHandler(request, response) {
       if (infoRequest.includes('name')) {
         let name = infoRequest.slice(5);
         name = name.charAt(0).toUpperCase() + name.slice(1);
-        // console.log(`number = ${request.query.From}, body = ${infoRequest}, name = ${name}`)
         const SQL = `INSERT INTO user_info (number, name) Values ($1, $2);`;
         const values = [request.query.From, name];
         dbClient.query(SQL, values);
@@ -186,7 +183,7 @@ function processText(request, response, query) {
         let gasSumm = result.body.businesses.map(function (gas) {
           return new GasStations(gas);
         });
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 2; i++) {
           message += `${gasSumm[i].name} is at ${gasSumm[i].address[0]}, ${gasSumm[i].address[1].slice(0, gasSumm[i].address[1].indexOf(',') + 4)}\n`
         }
         sendMessage(request, response, message);
@@ -204,7 +201,7 @@ function processText(request, response, query) {
         let hotelSumm = result.body.businesses.map(function (hotel) {
           return new Lodging(hotel);
         });
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 2; i++) {
           message += `${hotelSumm[i].name}, ${hotelSumm[i].rating} stars\n${hotelSumm[i].address[0]}, ${hotelSumm[i].address[1].slice(0, hotelSumm[i].address[1].indexOf(',') + 10)}\nPhone: (${hotelSumm[i].phone.slice(2, 5)}) ${hotelSumm[i].phone.slice(5, 8)}-${hotelSumm[i].phone.slice(8)}\n`
         }
         sendMessage(request, response, message);
@@ -216,49 +213,48 @@ function processText(request, response, query) {
     const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${query.latitude},${query.longitude}`;
     superagent.get(url).then(result => {
       const weatherSumm = new Weather(result.body.currently);
-      let message = `Hi ${query.name}\nThe forecast for today is ${weatherSumm.forecast}\nHigh of ${weatherSumm.temperature}\nWind Speed of ${weatherSumm.windSpeed}\nAnd ${weatherSumm.precipProbability}% chance of precipitation`;
+      let message = `Hi ${query.name}\nThe forecast for today is ${weatherSumm.forecast}\nHigh of ${weatherSumm.temperature}\xB0F\nWind Speed of ${weatherSumm.windSpeed} mph\nAnd ${weatherSumm.precipProbability}% chance of precipitation`;
       sendMessage(request, response, message);
-    });
+    })
+      .catch(error => handleError(error, response));
   }
 
   // Trails, 4 with option of 10 with keyword 'MORE', each sent in seperate text
-  if (infoRequest.includes('trails')) {
-    let numRequested = 4;
-    if (infoRequest.includes('more')) {
-      numRequested = 10;
-    }
+  if (infoRequest.includes('trail')) {
+    let message = '';
     const url = `https://www.hikingproject.com/data/get-trails?lat=${query.latitude}&lon=${query.longitude}&maxDistance=10&maxResults=8&key=${process.env.TRAILS_API_KEY}`;
     superagent.get(url)
       .then(result => {
         const trailListings = result.body.trails.map(function (trail) {
           return new Trails(trail);
         });
-        for (let i = 0; i < numRequested; i++) {
-          let message =  `${trailListings[i].name} is ${trailListings[i].summary} with ${trailListings[i].stars} stars\nIt's ${trailListings[i].length} miles long\nCondition is ${trailListings[i].conditions}`
-          sendMessage(request, response, message);
+        for (let i = 0; i < 3; i++) {
+          message += `${trailListings[i].name}\nIt's ${trailListings[i].length} miles long\nCondition is ${trailListings[i].conditions}\n`
         }
+        sendMessage(request, response, message);
       })
       .catch(error => handleError(error, response));
   }
   //Headlines, set to 4 headlines, one text per message, content truncated to 260 chars as is returned to us from api
   if (infoRequest.includes('headline')) {
-    const url = `https://newsapi.org/v2/top-headlines?country=us&pageSize=4&apiKey=${process.env.NEWS_API_KEY}`;
+    let message = '';
+    const url = `https://newsapi.org/v2/top-headlines?country=us&pageSize=3&apiKey=${process.env.NEWS_API_KEY}`;
     superagent.get(url)
       .then(result => {
         const newsHeadlines = result.body.articles.map(function (newsObj) {
           return new Headlines(newsObj);
         })
-        for (let i = 0; i < 4; i++) {
-          let message = `${newsHeadlines[i].title}\n${newsHeadlines[i].description}\n${newsHeadlines[i].content.slice(0, 260)}`;
-          sendMessage(request, response, message);
+        for (let i = 0; i < 3; i++) {
+          message += `${newsHeadlines[i].title}\n`;
         }
+        sendMessage(request, response, message);
       })
       .catch(error => handleError(error, response));
   }
 
   // Options *************** We could make this an else, which would catch empty messages? ************************************
   if (infoRequest.includes('options')) {
-    let message = `Hi ${query.name},\nAvailable Commands:\nLOCATION [City, State]\nWEATHER\nTRAILS\nMORE TRAILS\nLODGING\nGAS\nHOSPITALS\nHEADLINES`;
+    let message = `Hi ${query.name},\nAvailable Commands:\nLOCATION [City, State]\nWEATHER\nTRAILS\nLODGING\nGAS\nHOSPITALS\nHEADLINES`;
     sendMessage(request, response, message);
   }
 }
@@ -275,7 +271,7 @@ function sendMessage(request, response, message) {
     })
     .then(message => {
       console.log(message.sid);
-      response.send('This message goes to website');
+      response.send();
     })
     .done();
 }
