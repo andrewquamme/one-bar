@@ -33,7 +33,7 @@ main form {
 }
 
 main form input {
-  width: 90%;
+  width: 80%;
   border-radius: 5px;
   height: 30px;
   cursor: pointer;
