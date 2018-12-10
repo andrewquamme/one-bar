@@ -254,7 +254,7 @@ function sendMessage(request, response, message) {
   console.log(`Inside sendMessage, message =\n${message}`);
   smsClient.messages
     .create({
-      body: message,
+      body: `${message}\none-bar.info`,
       from: process.env.TWILIO_NUMBER,
       to: request.query.From
     })
