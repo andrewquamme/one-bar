@@ -26,16 +26,23 @@ main h3 {
   text-align: center;
 }
 
+main table {
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
 main table thead {
   border-bottom: 1px solid black;
 }
 
-main table thead th {
+main table thead tr th {
   font-weight: bold;
 }
 
-main table tbody {
-  border-spacing: 10px;
+main table tbody td{
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 5px;
 }
 
 main table tbody th {
@@ -43,14 +50,14 @@ main table tbody th {
   font-weight: bold;
 }
 
-
 footer {
   width: 100%;
   text-align: center;
-  margin: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 footer ul li {
   display: inline-block;
-  margin-left: 20px;
+  /* margin-left: 20px; */
 }
