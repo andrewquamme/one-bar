@@ -36,6 +36,10 @@ main img {
   margin-right: 20px;
 }
 
+main p {
+  margin-bottom: 20px;
+}
+
 main #andrew {
   margin: 20px 20px;
 }
