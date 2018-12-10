@@ -143,8 +143,8 @@ function smsHandler(request, response) {
 function processText(request, response, query) {
   const infoRequest = request.query.Body.toLowerCase();
 
-  // Location city, state
   if (infoRequest.includes('location')) {
+    // Location city, state
     let location = infoRequest.slice(9);
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${location}&key=${process.env.GOOGLE_API_KEY}`;
     superagent
@@ -156,9 +156,8 @@ function processText(request, response, query) {
         sendMessage(request, response, message);
       })
       .catch(error => handleError(error));
-  }
-  // Hospitals API - currently giving two hospitals (limit=2)
-  if (infoRequest.includes('hospital')) {
+  } else if (infoRequest.includes('hospital')) {
+    // Hospitals API - currently giving two hospitals (limit=2)
     const url = `https://api.yelp.com/v3/businesses/search?categories=hospitals&limit=2&latitude=${query.latitude}&longitude=${query.longitude}`;
     superagent
       .get(url)
@@ -171,10 +170,8 @@ function processText(request, response, query) {
         sendMessage(request, response, message);
       })
       .catch(error => handleError(error, response));
-  }
-
-  // Gas
-  if (infoRequest.includes('gas')) {
+  } else if (infoRequest.includes('gas')) {
+    // Gas
     let message = '';
     const url = `https://api.yelp.com/v3/businesses/search?categories=servicestations&limit=3&latitude=${query.latitude}&longitude=${query.longitude}`;
     superagent.get(url)
@@ -189,10 +186,8 @@ function processText(request, response, query) {
         sendMessage(request, response, message);
       })
       .catch(error => handleError(error, response));
-  }
-
-  // Lodging
-  if (infoRequest.includes('lodging')) {
+  } else if (infoRequest.includes('lodging')) {
+    // Lodging
     let message = '';
     const url = `https://api.yelp.com/v3/businesses/search?categories=hotels&limit=3&latitude=${query.latitude}&longitude=${query.longitude}`;
     superagent.get(url)
@@ -207,9 +202,8 @@ function processText(request, response, query) {
         sendMessage(request, response, message);
       })
       .catch(error => handleError(error, response));
-  }
-  // Weather todays forecast
-  if (infoRequest.includes('weather')) {
+  } else if (infoRequest.includes('weather')) {
+    // Weather todays forecast
     const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${query.latitude},${query.longitude}`;
     superagent.get(url).then(result => {
       const weatherSumm = new Weather(result.body.currently);
@@ -217,10 +211,8 @@ function processText(request, response, query) {
       sendMessage(request, response, message);
     })
       .catch(error => handleError(error, response));
-  }
-
-  // Trails, 4 with option of 10 with keyword 'MORE', each sent in seperate text
-  if (infoRequest.includes('trail')) {
+  } else if (infoRequest.includes('trail')) {
+    // Trails, 4 with option of 10 with keyword 'MORE', each sent in seperate text
     let message = '';
     const url = `https://www.hikingproject.com/data/get-trails?lat=${query.latitude}&lon=${query.longitude}&maxDistance=10&maxResults=8&key=${process.env.TRAILS_API_KEY}`;
     superagent.get(url)
@@ -234,9 +226,8 @@ function processText(request, response, query) {
         sendMessage(request, response, message);
       })
       .catch(error => handleError(error, response));
-  }
-  //Headlines, set to 4 headlines, one text per message, content truncated to 260 chars as is returned to us from api
-  if (infoRequest.includes('headline')) {
+  } else if (infoRequest.includes('headline')) {
+    //Headlines, set to 4 headlines, one text per message, content truncated to 260 chars as is returned to us from api
     let message = '';
     const url = `https://newsapi.org/v2/top-headlines?country=us&pageSize=3&apiKey=${process.env.NEWS_API_KEY}`;
     superagent.get(url)
@@ -250,10 +241,8 @@ function processText(request, response, query) {
         sendMessage(request, response, message);
       })
       .catch(error => handleError(error, response));
-  }
-
-  // Options *************** We could make this an else, which would catch empty messages? ************************************
-  if (infoRequest.includes('options')) {
+  } else {
+    // User has not sent a valid command, send options
     let message = `Hi ${query.name},\nAvailable Commands:\nLOCATION [City, State]\nWEATHER\nTRAILS\nLODGING\nGAS\nHOSPITALS\nHEADLINES`;
     sendMessage(request, response, message);
   }
