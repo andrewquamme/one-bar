@@ -70,6 +70,22 @@ function Hospitals(business) {
   this.phone = business.phone;
 }
 
+// Gas Model
+function GasStations(business) {
+  this.name = business.name;
+  //this.rating = business.rating;
+  this.address = business.location.display_address;
+  this.phone = business.phone;
+}
+
+// Lodging Model
+function Lodging(business) {
+  this.name = business.name;
+  this.rating = business.rating;
+  this.address = business.location.display_address;
+  this.phone = business.phone;
+}
+
 // Weather Model
 function Weather(day) {
   this.forecast = day.summary;
@@ -88,6 +104,13 @@ function Trails(trail) {
   this.summary = trail.summary;
 }
 
+// Headlines Model
+function Headlines(headlines) {
+  this.title = headlines.title;
+  this.description = headlines.description;
+  this.content = headlines.content;
+}
+
 function smsHandler(request, response) {
   const SQL = 'SELECT * FROM user_info WHERE number=$1;';
   const values = [request.query.From];
@@ -98,19 +121,23 @@ function smsHandler(request, response) {
       processText(request, response, result.rows[0]);
     } else {
       console.log('number not found'); 
-      
-      // **********Below has not been tested*************
-      
-      // const infoRequest = request.query.Body.toLowerCase();
-      // if (infoRequest.includes('name')) {
-      //   let name = infoRequest.slice(5)
-      //   const SQL = `INSERT user_info SET number=$1, name=$2;`;
-      //   const values = [request.query.From, name];
-      //   dbClient.query(SQL, values)
-      // } else {
-      //   const message = `Welcome to one-bar, please respond with NAME [YOUR NAME]`
-      //   sendMessage(request, response, message);
-      // }
+
+      // If number is not in DB it will prompt user to respond with name [uers name], then add number and name to DB
+      // Location is currently left blank but prompts user to enter one
+      const infoRequest = request.query.Body.toLowerCase();
+      if (infoRequest.includes('name')) {
+        let name = infoRequest.slice(5);
+        name = name.charAt(0).toUpperCase() + name.slice(1);
+        // console.log(`number = ${request.query.From}, body = ${infoRequest}, name = ${name}`)
+        const SQL = `INSERT INTO user_info (number, name) Values ($1, $2);`;
+        const values = [request.query.From, name];
+        dbClient.query(SQL, values);
+        let message = `Thanks ${name}, please respond with LOCATION [City, State]`;
+        sendMessage(request, response, message);
+      } else {
+        let message = `Welcome to one-bar, please respond with NAME [YOUR NAME]`
+        sendMessage(request, response, message);
+      }
     }
   });
 }
@@ -128,14 +155,13 @@ function processText(request, response, query) {
       .then(result => {
         const location = new Location(query, result);
         location.save();
-        let message = `Hi ${query.name}\nYour location is currently ${location.latitude} latitude, ${location.longitude} longitude`;
+        let message = `Hi ${query.name}, your location is currently ${location.latitude} latitude, ${location.longitude} longitude`;
         sendMessage(request, response, message);
       })
       .catch(error => handleError(error));
   }
   // Hospitals API - currently giving two hospitals (limit=2)
   if (infoRequest.includes('hospital')) {
-    console.log('inside hospital')
     const url = `https://api.yelp.com/v3/businesses/search?categories=hospitals&limit=2&latitude=${query.latitude}&longitude=${query.longitude}`;
     superagent
       .get(url)
@@ -150,6 +176,41 @@ function processText(request, response, query) {
       .catch(error => handleError(error, response));
   }
 
+  // Gas
+  if (infoRequest.includes('gas')) {
+    let message = '';
+    const url = `https://api.yelp.com/v3/businesses/search?categories=servicestations&limit=3&latitude=${query.latitude}&longitude=${query.longitude}`;
+    superagent.get(url)
+      .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+      .then(result => {
+        let gasSumm = result.body.businesses.map(function (gas) {
+          return new GasStations(gas);
+        });
+        for (let i = 0; i < 3; i++) {
+          message += `${gasSumm[i].name} is at ${gasSumm[i].address[0]}, ${gasSumm[i].address[1].slice(0, gasSumm[i].address[1].indexOf(',') + 4)}\n`
+        }
+        sendMessage(request, response, message);
+      })
+      .catch(error => handleError(error, response));
+  }
+
+  // Lodging
+  if (infoRequest.includes('lodging')) {
+    let message = '';
+    const url = `https://api.yelp.com/v3/businesses/search?categories=hotels&limit=3&latitude=${query.latitude}&longitude=${query.longitude}`;
+    superagent.get(url)
+      .set('Authorization', `Bearer ${process.env.YELP_API_KEY}`)
+      .then(result => {
+        let hotelSumm = result.body.businesses.map(function (hotel) {
+          return new Lodging(hotel);
+        });
+        for (let i = 0; i < 3; i++) {
+          message += `${hotelSumm[i].name}, ${hotelSumm[i].rating} stars\n${hotelSumm[i].address[0]}, ${hotelSumm[i].address[1].slice(0, hotelSumm[i].address[1].indexOf(',') + 10)}\nPhone: (${hotelSumm[i].phone.slice(2, 5)}) ${hotelSumm[i].phone.slice(5, 8)}-${hotelSumm[i].phone.slice(8)}\n`
+        }
+        sendMessage(request, response, message);
+      })
+      .catch(error => handleError(error, response));
+  }
   // Weather todays forecast
   if (infoRequest.includes('weather')) {
     const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${query.latitude},${query.longitude}`;
@@ -179,30 +240,45 @@ function processText(request, response, query) {
       })
       .catch(error => handleError(error, response));
   }
+  //Headlines, set to 4 headlines, one text per message, content truncated to 260 chars as is returned to us from api
+  if (infoRequest.includes('headline')) {
+    const url = `https://newsapi.org/v2/top-headlines?country=us&pageSize=4&apiKey=${process.env.NEWS_API_KEY}`;
+    superagent.get(url)
+      .then(result => {
+        const newsHeadlines = result.body.articles.map(function (newsObj) {
+          return new Headlines(newsObj);
+        })
+        for (let i = 0; i < 4; i++) {
+          let message = `${newsHeadlines[i].title}\n${newsHeadlines[i].description}\n${newsHeadlines[i].content.slice(0, 260)}`;
+          sendMessage(request, response, message);
+        }
+      })
+      .catch(error => handleError(error, response));
+  }
 
-  // Options
+  // Options *************** We could make this an else, which would catch empty messages? ************************************
   if (infoRequest.includes('options')) {
-    let message = `Hi ${query.name},\nAvailable Commands:\nLOCATION [City, State]\nWEATHER\nTRAILS\nMORE TRAILS\nLODGING\nGAS\nHOSPITALS`;
+    let message = `Hi ${query.name},\nAvailable Commands:\nLOCATION [City, State]\nWEATHER\nTRAILS\nMORE TRAILS\nLODGING\nGAS\nHOSPITALS\nHEADLINES`;
     sendMessage(request, response, message);
   }
 }
 
 // Create and send message via Twilio
 
-// // function sendMessage(request, response, message) {
-// //   console.log('inside sendMessage, message = ', message)
-// //   smsClient.messages
-// //     .create({
-// //       body: message,
-// //       from: process.env.TWILIO_NUMBER,
-// //       to: request.query.From
-// //     })
-// //     .then(message => {
-// //       console.log(message.sid);
-// //       response.send('This message goes to website');
-// //     })
-// //     .done();
-// // }
+function sendMessage(request, response, message) {
+  console.log(`Inside sendMessage, message =\n${message}`);
+  smsClient.messages
+    .create({
+      body: message,
+      from: process.env.TWILIO_NUMBER,
+      to: request.query.From
+    })
+    .then(message => {
+      console.log(message.sid);
+      response.send('This message goes to website');
+    })
+    .done();
+}
 
 app.get('*', (request, response) => {
   response.send('Hitting the API');
