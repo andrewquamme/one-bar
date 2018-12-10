@@ -1,7 +1,7 @@
 body {
   background: rgb(253, 253, 246);
   font-family: 'Courier New', Courier, monospace;
-  width: 480px;
+  width: 560px;
   margin: auto;
 }
 
@@ -27,37 +27,36 @@ main {
   width: 100%;
 }
 
-main img {
-  float: left;
-  width: 20%;
-  height: auto;
-  margin-right: 20px;
+main form {
+  width: 100%;
+  text-align: center;
 }
 
-main #andrew {
-  margin: 20px 20px;
+main form fieldset {
+  padding: 5px;
 }
 
-main #adam {
-  margin: 20px 20px;
+main form input {
+  width: 100%;
+  border-radius: 5px;
+  height: 30px;
+  cursor: pointer;
 }
 
-main #michael {
-  margin: 20px 20px;
-}
-
-main #jared {
-  margin: 20px 20px;
+main form button {
+  margin-top: 20px;
+  font-size: 20px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 footer {
   width: 100%;
-  margin: auto;
-  margin-bottom: 20px;
   text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 footer ul li {
   display: inline-block;
-  margin-left: 20px;
 }

@@ -3,36 +3,45 @@
 
 <head>
   <title>One-Bar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="/styles/reset.css">
   <link rel="stylesheet" href="/styles/layout.css">
-  <link rel="stylesheet" href="/styles/base.css">
+  <link rel="stylesheet" href="/styles/request.css">
 </head>
 
 <body>
-  <main>
 
+  <header>
+    <div id="logo">
+      <img src="/assests/logo.png" alt="One-Bar" />
+    </div>
     <h1>Request Access to One-Bar</h1>
+  </header>
 
+  <main>
     <form action="mailto:contact@one-bar.info" method="post" enctype="text/plain">
-      Name:<br>
-      <input type="text" name="name"><br>
-      E-mail:<br>
-      <input type="text" name="email"><br>
-      Mobile Number:<br>
-      <input type="text" name="phone"><br>
-      Comment:<br>
-      <input type="text" name="comment" size="50"><br><br>
-      <input type="submit" value="Send">
-      <input type="reset" value="Reset">
+      <fieldset>
+        <label>Name:</input>
+        <input type="text" name="name">
+        <label>E-mail:</label>
+        <input type="text" name="email">
+        <label>Mobile Number:</label>
+        <input type="text" name="phone">
+        <label>Comment:</label>
+        <input type="text" name="comment" size="50">
+        <button type="submit" value="Send">Send</button>
+        <button type="reset" value="Reset">Reset</button>
+      </fieldset>
     </form>
   </main>
 
   <footer>
     <ul>
-      <li>One-Bar &copy; 2018</li>
-      <li><a href="/about">Meet the Developers</a></li>
+      <li><a href="/">One-Bar</a> &copy; 2018</li>
+      <li><a href="/about">Meet the Developers!</a></li>
     </ul>
   </footer>
+
 </body>
 
 </html>
