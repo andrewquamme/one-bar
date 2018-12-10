@@ -1,7 +1,6 @@
 body {
   background: rgb(253, 253, 246);
   font-family: 'Courier New', Courier, monospace;
-  width: 480px;
   margin: auto;
 }
 
@@ -24,12 +23,15 @@ header img {
 }
 
 main {
-  width: 100%;
+  width: 75%;
+  margin: 0px auto;
+  display: flex;
+  flex-flow: row wrap;
+
 }
 
 main img {
   float: left;
-  width: 20%;
   height: auto;
   margin-right: 20px;
 }
