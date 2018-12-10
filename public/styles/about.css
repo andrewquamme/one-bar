@@ -1,0 +1,61 @@
+body {
+  background: rgb(253, 253, 246);
+  font-family: 'Courier New', Courier, monospace;
+  width: 480px;
+  margin: auto;
+}
+
+header h1{
+  width: 100%;
+  margin: 10px auto;
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center; 
+}
+
+header img {
+  width: 200px;
+  margin: 10px auto;
+}
+
+#logo {
+  width: 100%;
+  text-align: center;
+}
+
+main {
+  width: 100%;
+}
+
+main img {
+  float: left;
+  width: 20%;
+  height: auto;
+  margin-right: 20px;
+}
+
+main #andrew {
+  margin: 20px 20px;
+}
+
+main #adam {
+  margin: 20px 20px;
+}
+
+main #michael {
+  margin: 20px 20px;
+}
+
+main #jared {
+  margin: 20px 20px;
+}
+
+footer {
+  width: 100%;
+  margin: auto;
+}
+
+footer ul li {
+  display: inline-block;
+  margin-left: 20px;
+}
