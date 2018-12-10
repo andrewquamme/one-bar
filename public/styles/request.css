@@ -23,7 +23,8 @@ header img {
 }
 
 main {
-  width: 100%;
+  width: 90%;
+  margin: 0px auto;
 }
 
 main form {
@@ -31,12 +32,8 @@ main form {
   text-align: center;
 }
 
-main form fieldset {
-  padding: 5px;
-}
-
 main form input {
-  width: 100%;
+  width: 90%;
   border-radius: 5px;
   height: 30px;
   cursor: pointer;
