@@ -2,6 +2,7 @@ body {
   background: rgb(253, 253, 246);
   font-family: 'Courier New', Courier, monospace;
   margin: auto;
+  width: 70%;
 }
 
 header h1{
