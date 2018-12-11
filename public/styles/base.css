@@ -1,3 +1,7 @@
+.bold {
+  font-weight: bold;
+}
+
 body {
   background: rgb(253, 253, 246);
   font-family: 'Courier New', Courier, monospace;
