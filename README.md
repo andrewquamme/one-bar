@@ -335,5 +335,3 @@ number VARCHAR(255) PRIMARY KEY,
   name VARCHAR(255),
   latitude NUMERIC(8, 6),
   longitude NUMERIC(9, 6)
-Weather date retrieved from: Darksky.net
-
