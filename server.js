@@ -129,10 +129,10 @@ function smsHandler(request, response) {
         const SQL = `INSERT INTO user_info (number, name) Values ($1, $2);`;
         const values = [request.query.From, name];
         dbClient.query(SQL, values);
-        let message = `Thanks ${name}, please respond with LOCATION [City, State]`;
+        let message = `Thanks ${name}, please respond with\nLOCATION [City, State]`;
         sendMessage(request, response, message);
       } else {
-        let message = `Welcome to one-bar, please respond with NAME [YOUR NAME]`
+        let message = `Welcome to One-Bar, please respond with\nNAME [YOUR NAME]`
         sendMessage(request, response, message);
       }
     }
@@ -207,7 +207,7 @@ function processText(request, response, query) {
     const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${query.latitude},${query.longitude}`;
     superagent.get(url).then(result => {
       const weatherSumm = new Weather(result.body.currently);
-      let message = `Hi ${query.name}\nThe forecast for today is ${weatherSumm.forecast}\nHigh of ${weatherSumm.temperature}\xB0F\nWind Speed of ${weatherSumm.windSpeed} mph\nAnd ${weatherSumm.precipProbability}% chance of precipitation`;
+      let message = `Hi ${query.name}\nThe forecast for today is ${weatherSumm.forecast}\nHigh of ${weatherSumm.temperature}\xB0F\nWind Speed of ${weatherSumm.windSpeed} mph`;
       sendMessage(request, response, message);
     })
       .catch(error => handleError(error, response));
