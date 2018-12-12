@@ -1,25 +1,23 @@
-<!-- Name of the project  -->
-# one-bar:  Code 301 final project
+# One-Bar:  Code 301 final project
 
-<!-- Names of the team members -->
 Andrew Quamme, Adam Wittnam, Michael George, and Jared Pattison
 
 ##  Description:
-One-Bar is a simple SMS based application that allows an outdoors-person to have access to vital information when internet in not available.
+One-Bar is a simple SMS based application that allows an outdoors-person to have access to vital information when internet is not available.
 
 
-## Required libraries, frameworks, packages:
-    "cors": "^2.8.5",
-    "dotenv": "^6.2.0",
-    "ejs": "^2.6.1",
-    "express": "^4.16.4",
-    "pg": "^7.7.1",
-    "superagent": "^4.0.0",
-    "twilio": "^3.25.0"
+## Required Libraries, Frameworks, Packages
+`cors`
+`dotenv`
+`ejs`
+`express`
+`pg`
+`superagent`
+`twilio`
 
-##API's:
-###Weather data retrieved from:  https://darksky.net/forecast/
-darksky api example data:
+## API's and Database Information
+### Weather data retrieved from:  https://darksky.net/forecast/
+```JSON
 {
     "latitude": 47,
     "longitude": -122,
@@ -45,10 +43,12 @@ darksky api example data:
         "uvIndex": 0,
         "visibility": 7.79,
         "ozone": 339.15
-    },
+    }
+}
+```
 
-###Geolocation data retrieved from: https://maps.googleapis.com/maps/api/geocode/
-geocode api data example:
+### Geolocation data retrieved from: https://maps.googleapis.com/maps/api/geocode/
+```JSON
 {
     "plus_code": {
         "compound_code": "P27Q+MC New York, NY, USA",
@@ -152,9 +152,10 @@ geocode api data example:
                 "store"
             ]
         },
+```
 
-###Trails data retrieved from:  https://www.hikingproject.com/data/get-trails
-trails api data example:
+### Trails data retrieved from:  https://www.hikingproject.com/data/get-trails
+```JSON
 "trails": [
         {
             "id": 7000130,
@@ -180,11 +181,13 @@ trails api data example:
             "conditionStatus": "Bad / Closed",
             "conditionDetails": "The Bear Canyon trail is closed through November 2018 but Fern Canyon is open.",
             "conditionDate": "2018-09-12 00:00:00"
-        },
-###Hospital data retrieved from:  https://api.yelp.com/v3/businesses/search?categories=hospitals
-hospital api data example:
-{
-```"businesses": [
+        }
+]
+```
+
+### Hospital data retrieved from:  https://api.yelp.com/v3/businesses/search?categories=hospitals
+```JSON
+"businesses": [
         {
             "id": "A8ILbeOhHlINo9HPtKcQ1Q",
             "alias": "cancer-institute-at-swedish-medical-center-seattle-2",
@@ -225,10 +228,12 @@ hospital api data example:
             "phone": "+12063862323",
             "display_phone": "(206) 386-2323",
             "distance": 805.6010863118303
-        }```
+        }
+]
+```
 
 ###Fuel/Service Station data retrieved from:  https://api.yelp.com/v3/businesses/search?categories=servicestations
-service station api data example:
+```JSON
 "businesses": [
         {
             "id": "wC3nHsCF1Pox306k1tBcRQ",
@@ -271,9 +276,10 @@ service station api data example:
             "display_phone": "(425) 821-2345",
             "distance": 15991.061629596416
         }
-
-###Lodging information data retrieved from:  https://api.yelp.com/v3/businesses/search?categories=hotels
-lodging api data example:
+]
+```
+### Lodging information data retrieved from:  https://api.yelp.com/v3/businesses/search?categories=hotels
+```JSON
 "businesses": [
         {
             "id": "UMC8IVZB7o7Vsv8ownttmg",
@@ -313,25 +319,29 @@ lodging api data example:
             "display_phone": "(206) 957-1000",
             "distance": 328.73822076177123
         }
-News information data retrieved from:  https://newsapi.org/v2/top-headlines?country 
-news api example: 
+]
+```
+### News information data retrieved from:  https://newsapi.org/v2/top-headlines?country 
+```JSON
 {
-            "source": {
-                "id": null,
-                "name": "Washingtonexaminer.com"
-            },
-            "author": "https://www.washingtonexaminer.com/author/philip-klein",
-            "title": "Eating raw cookie dough is probably worth the risk - Washington Examiner",
-            "description": "The Centers for Disease Control and Prevention is out with a warning that nobody who likes to eat delicious things wants to read: \"Say No to Raw Dough!\" But the truth is that eating raw cookie dough is probably worth the risk for most people.",
-            "url": "https://www.washingtonexaminer.com/opinion/eating-raw-cookie-dough-is-probably-worth-the-risk",
-            "urlToImage": "https://mediadc.brightspotcdn.com/dims4/default/c2b0a3e/2147483647/strip/true/crop/1060x557+0+22/resize/1200x630!/quality/90/?url=https%3A%2F%2Fmediadc.brightspotcdn.com%2F8b%2F20%2F8557612a483d9060c3f6f7c04251%2Fistock-864680082.jpg",
-            "publishedAt": "2018-12-10T22:14:00Z",
-            "content": "T he Centers for Disease Control and Prevention is out with a warning that nobody who likes to eat delicious things wants to read: \" Say No to Raw Dough !\" But the truth is that eating raw cookie dough is probably worth the risk for most people. In a special … [+2252 chars]"
-        },
-
-
-Database schema:
+    "source": {
+        "id": null,
+        "name": "Washingtonexaminer.com"
+    },
+    "author": "https://www.washingtonexaminer.com/author/philip-klein",
+    "title": "Eating raw cookie dough is probably worth the risk - Washington Examiner",
+    "description": "The Centers for Disease Control and Prevention is out with a warning that nobody who likes to eat delicious things wants to read: \"Say No to Raw Dough!\" But the truth is that eating raw cookie dough is probably worth the risk for most people.",
+    "url": "https://www.washingtonexaminer.com/opinion/eating-raw-cookie-dough-is-probably-worth-the-risk",
+    "urlToImage": "https://mediadc.brightspotcdn.com/dims4/default/c2b0a3e/2147483647/strip/true/crop/1060x557+0+22/resize/1200x630!/quality/90/?url=https%3A%2F%2Fmediadc.brightspotcdn.com%2F8b%2F20%2F8557612a483d9060c3f6f7c04251%2Fistock-864680082.jpg",
+    "publishedAt": "2018-12-10T22:14:00Z",
+    "content": "T he Centers for Disease Control and Prevention is out with a warning that nobody who likes to eat delicious things wants to read: \" Say No to Raw Dough !\" But the truth is that eating raw cookie dough is probably worth the risk for most people. In a special … [+2252 chars]"
+}
+```
+### Database Schema
+```SQL
 number VARCHAR(255) PRIMARY KEY,
   name VARCHAR(255),
   latitude NUMERIC(8, 6),
   longitude NUMERIC(9, 6)
+```
+Special thanks to Jax Cutsforth for remotely testing our application and providing feedback (and finding our typos).
