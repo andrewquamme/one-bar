@@ -87,9 +87,9 @@ function Lodging(business) {
 // Weather Model
 function Weather(day) {
   this.forecast = day.summary;
-  this.temperature = day.temperature;
+  this.temperature = day.temperatureHigh;
   this.windSpeed = day.windSpeed;
-  this.precipProbability = day.precipProbability;
+  this.precipProbability = day.precipProbability*100;
 }
 
 // Trails Model
@@ -206,8 +206,8 @@ function processText(request, response, query) {
     // Weather todays forecast
     const url = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${query.latitude},${query.longitude}`;
     superagent.get(url).then(result => {
-      const weatherSumm = new Weather(result.body.currently);
-      let message = `Hi ${query.name}\nThe forecast for today is ${weatherSumm.forecast}\nHigh of ${weatherSumm.temperature}\xB0F\nWind Speed of ${weatherSumm.windSpeed} mph`;
+      const weatherSumm = new Weather(result.body.daily.data[0]);
+      let message = `Hi ${query.name}\nThe forecast for today is ${weatherSumm.forecast}\nHigh of ${weatherSumm.temperature}\xB0F\nWind speed of ${weatherSumm.windSpeed} mph\nChance of precipitation ${weatherSumm.precipProbability}%`;
       sendMessage(request, response, message);
     })
       .catch(error => handleError(error, response));
@@ -251,7 +251,7 @@ function processText(request, response, query) {
 // Create and send message via Twilio
 
 function sendMessage(request, response, message) {
-  console.log(`Inside sendMessage, message =\n${message}`);
+  console.log(`Sent message =\n${message}`);
   smsClient.messages
     .create({
       body: `${message}\none-bar.info`,
