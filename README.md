@@ -232,7 +232,7 @@ One-Bar is a simple SMS based application that allows an outdoors-person to have
 ]
 ```
 
-###Fuel/Service Station data retrieved from:  https://api.yelp.com/v3/businesses/search?categories=servicestations
+### Fuel/Service Station data retrieved from:  https://api.yelp.com/v3/businesses/search?categories=servicestations
 ```JSON
 "businesses": [
         {
